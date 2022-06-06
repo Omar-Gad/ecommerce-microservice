@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
-from rest_framework import generics, status, mixins
+from rest_framework import generics, status, views
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from cart.serializers import CartSerializer, CartItemSerializer
@@ -33,7 +33,7 @@ class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
 class CartItemCreateView(generics.CreateAPIView):
     serializer_class = CartItemSerializer
     authentication_classes = (TokenAuthentication,)
-    
+
     def get_queryset(self):
         return CartItemDetailView.get_queryset(self)
 
@@ -45,3 +45,17 @@ class CartItemCreateView(generics.CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+
+class CartCheckout(views.APIView):
+    authentication_classes=(TokenAuthentication,)
+    def get(self, request, format=None, *args, **kwargs):
+        cart = request.user.cart
+        cart_items = CartItem.objects.filter(cart=cart)
+        order = Order.objects.create(total=cart.total, user=cart.user)
+        for item in cart_items:
+            OrderItem.objects.create(quantity=item.quantity, product=item.product, order=order)
+        cart.delete()
+        Cart.objects.create(user=request.user)
+        new_order = OrderSerializer(order).data
+        return Response({'New order':new_order})
