@@ -8,7 +8,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         ret =  super().to_representation(instance)
         product_id = ret['product']
-        product = requests.get(f'http://localhost:7000/api/product/{product_id}')
+        product = requests.get(f'http://host.docker.internal:7000/api/product/{product_id}')
         ret['product'] = product.json()
         return ret
     

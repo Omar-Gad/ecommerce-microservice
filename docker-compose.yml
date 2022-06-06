@@ -1,0 +1,63 @@
+version: '3'
+
+services:
+  account-db:
+    container_name: account-db
+    image: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./account-service/data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=acc
+      - POSTGRES_USER=acc
+      - POSTGRES_PASSWORD=acc
+    restart: always
+
+
+  inventory-db:
+    container_name: inventory-db
+    image: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./inventory-service/data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=inv
+      - POSTGRES_USER=inv
+      - POSTGRES_PASSWORD=inv
+    restart: always
+
+
+  account-api:
+    container_name: account-api
+    build: ./account-service
+    volumes:
+      - ./account-service:/code
+    ports:
+      - 8000:8000
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - account-db
+    links:
+      - inventory-api:inventory-api
+
+    
+  inventory-api:
+    container_name: inventory-api
+    build: ./inventory-service
+    volumes:
+      - ./inventory-service:/code
+    ports:
+      - 7000:7000
+    command: python manage.py runserver 0.0.0.0:7000
+    depends_on:
+      - inventory-db
+
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+  
