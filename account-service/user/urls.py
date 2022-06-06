@@ -3,6 +3,6 @@ from user.views import ProfileListCreateGenericAPIView, ProfileGenericAPIView, L
 
 urlpatterns = [
     path('user/', ProfileListCreateGenericAPIView.as_view()),
-    path('user/<pk>', ProfileGenericAPIView.as_view()),
+    path('user/<pk>/', ProfileGenericAPIView.as_view()),
     path('login/', LoginAPIView.as_view()),
 ]

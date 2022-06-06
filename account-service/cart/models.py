@@ -10,9 +10,15 @@ class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return f"{self.user.username}'s cart"
 
 
 class CartItem(models.Model):
     quantity = models.IntegerField(default=0)
     product = models.IntegerField(default=None)
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE, related_name='cart_item')
+    
+    def __str__(self):
+        return f"cart item {self.id}"
