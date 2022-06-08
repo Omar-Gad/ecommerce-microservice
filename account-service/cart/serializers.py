@@ -19,15 +19,21 @@ class CartItemSerializer(serializers.ModelSerializer):
         ret['product'] = product.json()
         return ret
     
-    def create(self, validated_data):
-        print(validated_data)
-        return super().create(validated_data)
+    def get_extra_kwargs(self):
+        extra_kwargs = super().get_extra_kwargs()
+        method = self.context['request'].method
+
+        if method in ['PUT', 'PATCH']:
+            kwargs = extra_kwargs.get('product', {})
+            kwargs['read_only'] = True
+            extra_kwargs['product'] = kwargs
+
+        return extra_kwargs
+    
 
 class CartSerializer(serializers.ModelSerializer):
     cart_item = CartItemSerializer(many=True)
     class Meta:
         model = Cart
         fields = '__all__'
-        
-        
         
