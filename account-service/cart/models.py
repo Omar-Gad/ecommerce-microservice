@@ -11,6 +11,21 @@ class Cart(models.Model):
     updated_at = models.DateField(auto_now=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     
+    def update_cart_data(self,oldq=0,oldt=0,newq=0,newt=0,method=None):
+        if method == 'create':
+            self.quantity += newq
+            self.total += newt
+        elif method == 'update':
+            self.quantity -= oldq
+            self.total -= oldt
+            self.quantity += newq
+            self.total += newt
+        elif method == 'delete':
+            self.quantity -= oldq
+            self.total -= oldt
+        
+        self.save()
+    
     def __str__(self):
         return f"{self.user.username}'s cart"
 
