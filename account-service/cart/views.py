@@ -1,4 +1,4 @@
-import django
+import requests
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from rest_framework import generics, status, views
@@ -123,6 +123,10 @@ class CartCheckout(views.APIView):
         cart_items = CartItem.objects.filter(cart=cart)
         order = Order.objects.create(total=cart.total, user=cart.user)
         for item in cart_items:
+            product = requests.get(
+                f'http://host.docker.internal:7000/api/product/{item.product}/').json()
+            requests.patch(f'http://host.docker.internal:7000/api/product/{item.product}/',
+                           {'quantity': product['quantity']-item.quantity})
             OrderItem.objects.create(
                 quantity=item.quantity, product=item.product, order=order)
         cart.delete()
