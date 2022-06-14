@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import generics, status, views
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from cart.serializers import CartSerializer, CartItemSerializer
 from cart.models import Cart, CartItem
 
@@ -16,6 +17,7 @@ User = get_user_model()
 class CartDetailView(generics.RetrieveAPIView):
     serializer_class = CartSerializer
     authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     def get_object(self):
         user_pk = self.kwargs['user_pk']
@@ -25,6 +27,7 @@ class CartDetailView(generics.RetrieveAPIView):
 class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CartItemSerializer
     authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         cart = CartDetailView.get_object(self)
@@ -73,6 +76,7 @@ class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
 class CartItemCreateView(generics.CreateAPIView):
     serializer_class = CartItemSerializer
     authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         return CartItemDetailView.get_queryset(self)
@@ -117,6 +121,7 @@ class CartItemCreateView(generics.CreateAPIView):
 
 class CartCheckout(views.APIView):
     authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None, *args, **kwargs):
         cart = request.user.cart

@@ -1,6 +1,6 @@
 import requests
 from django.contrib.auth import get_user_model
-from rest_framework import generics, mixins
+from rest_framework import generics, mixins, permissions, authentication
 from order.serializers import OrderSerializer, OrderItemSerializer
 from order.models import Order, OrderItem
 
@@ -10,6 +10,8 @@ User = get_user_model()
 
 class OrderListView(generics.ListAPIView):
     serializer_class = OrderSerializer
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         user_pk = self.kwargs['user_pk']
@@ -21,6 +23,8 @@ class OrderDetailView(mixins.RetrieveModelMixin,
                       generics.GenericAPIView):
     serializer_class = OrderSerializer
     queryset = Order.objects.all()
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
@@ -42,6 +46,8 @@ class OrderItemDetailView(mixins.RetrieveModelMixin,
                           mixins.DestroyModelMixin,
                           generics.GenericAPIView):
     serializer_class = OrderItemSerializer
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         order_pk = self.kwargs['order_pk']
